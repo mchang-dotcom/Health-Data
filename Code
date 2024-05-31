@@ -1,0 +1,54 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.impute import SimpleImputer
+import matplotlib.pyplot as plt
+
+# Loading
+data_path = '/mnt/data/diabetes.csv'
+diabetes_data = pd.read_csv(data_path)
+
+# Zero Values
+columns_with_zeros = ['Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI']
+print((diabetes_data[columns_with_zeros] == 0).sum())
+
+# Imputation on zero values with median
+imputer = SimpleImputer(missing_values=0, strategy='median')
+diabetes_data[columns_with_zeros] = imputer.fit_transform(diabetes_data[columns_with_zeros])
+
+# Standardization
+scaler = StandardScaler()
+X = scaler.fit_transform(diabetes_data.drop('Outcome', axis=1))
+y = diabetes_data['Outcome'].values
+
+# Split Testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initializing lists to store accuracies for different values of K
+training_accuracy = []
+testing_accuracy = []
+
+# Testing K values from 1 to 15
+neighbors_settings = range(1, 16)
+
+for n_neighbors in neighbors_settings:
+    # Build the KNN model
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
+    knn.fit(X_train, y_train)
+    
+    # Record training set accuracy
+    training_accuracy.append(knn.score(X_train, y_train))
+    # Record generalization accuracy
+    testing_accuracy.append(knn.score(X_test, y_test))
+
+# Visualization
+plt.figure(figsize=(10, 6))
+plt.plot(neighbors_settings, training_accuracy, label='Training Accuracy')
+plt.plot(neighbors_settings, testing_accuracy, label='Testing Accuracy')
+plt.ylabel("Accuracy")
+plt.xlabel("Number of Neighbors")
+plt.title("KNN: Varying Number of Neighbors (Training vs. Testing Accuracy)")
+plt.legend()
+plt.show()
