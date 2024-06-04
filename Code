@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 
-# Loading
+# Data Loading
 data_path = '/mnt/data/diabetes.csv'
 diabetes_data = pd.read_csv(data_path)
 
@@ -38,12 +38,12 @@ for n_neighbors in neighbors_settings:
     knn = KNeighborsClassifier(n_neighbors=n_neighbors)
     knn.fit(X_train, y_train)
     
-    # Record training set accuracy
+    # Recording the training set for accuracy
     training_accuracy.append(knn.score(X_train, y_train))
     # Record generalization accuracy
     testing_accuracy.append(knn.score(X_test, y_test))
 
-# Visualization
+# KNN Visualization
 plt.figure(figsize=(10, 6))
 plt.plot(neighbors_settings, training_accuracy, label='Training Accuracy')
 plt.plot(neighbors_settings, testing_accuracy, label='Testing Accuracy')
@@ -51,4 +51,11 @@ plt.ylabel("Accuracy")
 plt.xlabel("Number of Neighbors")
 plt.title("KNN: Varying Number of Neighbors (Training vs. Testing Accuracy)")
 plt.legend()
+plt.show()
+
+# Visualization of the Heatmap Correlation Matrix
+correlation_matrix = diabetes_data.corr()
+plt.figure(figsize=(12, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5)
+plt.title("Correlation Matrix of Diabetes Dataset Features")
 plt.show()
